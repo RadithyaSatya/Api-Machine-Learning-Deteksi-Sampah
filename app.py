@@ -3,16 +3,16 @@ from PIL import Image
 import numpy as np
 import tensorflow as tf
 import io
+import os
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 
 app = Flask(__name__)
 
-# Load model
 model = tf.keras.models.load_model('model.h5')
 
-# Kelas-kelas yang sudah didefinisikan
 class_names = ['beterai', 'biologis', 'kaca', 'kardus', 'kertas', 'logam', 'pakaian', 'plastik', 'sampah', 'sepatu']
 
-# Menentukan kategori untuk setiap kelas
 organik_classes = ['biologis', 'sampah']
 non_organik_classes = ['kaca', 'kardus', 'kertas', 'logam', 'plastik', 'pakaian','sepatu']
 berbahaya_classes = ['beterai']
@@ -23,7 +23,6 @@ def preprocess_image(image_bytes):
     image_array = np.array(image) / 255.0
     return np.expand_dims(image_array, axis=0)
 
-# Endpoint prediksi
 @app.route('/predict', methods=['POST'])
 def predict():
     if 'file' not in request.files:
@@ -49,8 +48,11 @@ def predict():
     return jsonify({
         'prediksi': predicted_class,
         'persen': f"{confidence:.2f}%",
-        'kategori': category  # Menambahkan kategori
+        'kategori': category  
     })
 
+import os
+
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    port = int(os.environ.get('PORT', 8080))
+    app.run(host='0.0.0.0', port=port)
