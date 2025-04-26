@@ -4,17 +4,18 @@ import numpy as np
 import tensorflow as tf
 import io
 import os
+from flask_cors import CORS  
 
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 app = Flask(__name__)
 
+CORS(app)  
 model = tf.keras.models.load_model('model.h5')
 
 class_names = ['beterai', 'biologis', 'kaca', 'kardus', 'kertas', 'logam', 'pakaian', 'plastik', 'sampah', 'sepatu']
-
-organik_classes = ['biologis', 'sampah']
-non_organik_classes = ['kaca', 'kardus', 'kertas', 'logam', 'plastik', 'pakaian','sepatu']
+organik_classes = ['biologis', 'sampah', 'kertas']
+non_organik_classes = ['kaca', 'kardus', 'logam', 'plastik', 'pakaian', 'sepatu'] 
 berbahaya_classes = ['beterai']
 
 def preprocess_image(image_bytes):
@@ -50,8 +51,6 @@ def predict():
         'persen': f"{confidence:.2f}%",
         'kategori': category  
     })
-
-import os
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8080))
